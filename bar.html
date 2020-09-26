@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<style>
+			
+			.bar{
+			fill: steelblue;
+			}
+			
+			.bar:hover{
+			fill: brown;
+			}
+			
+			.axis {
+			font: 10px Courier New;
+			}
+			
+			.axis path{
+			fill: none;
+			stroke: #000;
+			shape-rendering: crispEdges;
+			}
+			
+			.toolTip {
+			position: absolute;
+			display: none;
+			min-width: 80px;
+			height: auto;
+			background: none repeat scroll 0 0 #ffffff;
+			border: 1px solid #6F257F;
+			padding: 14px;
+			text-align: center;
+			opacity:0.8;
+			font: 10px Courier New;
+			}
+			
+		</style>
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+	</head>
+	<body>
+		<div id="chart"></div>		
+		<script>
+			//data
+			var data = [
+			{
+			"Label": "Ant",
+			"Value": 120	
+			},
+			{
+			"Label" : "Bat",
+			"Value": 112
+			},
+			{
+			"Label" : "Cat",
+			"Value": 77
+			},
+			{
+			"Label" : "Dog",
+			"Value": 94
+			},
+			{
+			"Label" : "Elephant",
+			"Value" : 154
+			},
+			{
+			"Label" : "Fox",
+			"Value" : 121
+			},
+			{
+			"Label" : "Goat",
+			"Value" : 97
+			},
+			{
+			"Label" : "Hare",
+			"Value" : 81
+			},
+			{
+			"Label" : "Impala",
+			"Value" : 117
+			}
+			] 
+			
+			// set the dimensions
+			var margin = {top: 20, right: 20, bottom: 70, left: 40},
+			width = 600 - margin.left - margin.right,
+			height = 300 - margin.top - margin.bottom;
+			
+			// set the ranges
+			var x = d3.scaleBand()
+			.range([0, width])
+			.padding(0.1);
+			
+			
+			var y = d3.scaleLinear().range([height, 0]);
+			
+			// define the axis
+			var xAxis = d3.axisBottom(x)
+			
+			var yAxis = d3.axisLeft(y)
+			.tickSize(-width, 0, 0);
+			
+			// add the SVG element
+			var svg = d3.select("#chart").append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+			.append("g")
+			.attr("transform", 
+			"translate(" + margin.left + "," + margin.top + ")");
+			
+			var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+			
+			data.forEach(function(d) {
+				d.Label = d.Label;
+				d.Value = +d.Value;
+			});
+			
+			// scale the range of the data
+			x.domain(data.map(function(d) { return d.Label; }));
+			y.domain([0, d3.max(data, function(d) { return d.Value; }) + 10 ]);
+			
+			// add axis
+			svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + height + ")")
+			.call(xAxis)
+			.selectAll("text")
+			.style("text-anchor", "end")
+			.attr("dx", "-.8em")
+			.attr("dy", "-.55em")
+			.attr("transform", "rotate(-90)" );
+			
+			svg.append("g")
+			.attr("class", "y axis")
+			.call(yAxis)
+			.select(".domain").remove();
+			
+			
+			// Add bar chart and tooltip
+			svg.selectAll("bar")
+			.data(data)
+			.enter().append("rect")
+			.attr("class", "bar")
+			.attr("x", function(d) { return x(d.Label); })
+			.attr("width", x.bandwidth())
+			.attr("y", function(d) { return y(d.Value); })
+			.attr("height", function(d) { return height - y(d.Value); })
+			.on("mousemove", function(d){
+				tooltip
+				.style("left", d3.event.pageX - 50 + "px")
+				.style("top", d3.event.pageY - 70 + "px")
+				.style("display", "inline-block")
+				.html((d.Label) + " : " + (d.Value));
+			})
+			.on("mouseout", function(d){ tooltip.style("display", "none");});
+			
+			
+			svg.selectAll("line").attr("stroke", "lightgrey");
+			
+			
+		</script>
+		
+	</body>
+	</html>					
