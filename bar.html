@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<title>Bar chart</title>
 		<style>
 			
 			.bar{
@@ -92,7 +93,8 @@
 			.padding(0.1);
 			
 			
-			var y = d3.scaleLinear().range([height, 0]);
+			var y = d3.scaleLinear()
+			.range([height, 0]);
 			
 			// define the axis
 			var xAxis = d3.axisBottom(x)
@@ -108,7 +110,9 @@
 			.attr("transform", 
 			"translate(" + margin.left + "," + margin.top + ")");
 			
-			var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+			var tooltip = d3.select("#chart")
+			.append("div")
+			.attr("class", "toolTip");
 			
 			data.forEach(function(d) {
 				d.Label = d.Label;
@@ -161,4 +165,4 @@
 		</script>
 		
 	</body>
-	</html>					
+</html>					
