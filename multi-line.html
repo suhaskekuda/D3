@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Multi Line Chart</title>
+		<style type="text/css">
+			text {
+			font: 10px Courier New;
+			}
+			
+			.line {
+			fill: none;
+			}
+			
+			.toolTip {
+			position: absolute;
+			display: none;
+			min-width: 80px;
+			height: auto;
+			background: none repeat scroll 0 0 #ffffff;
+			border: 1px solid #6F257F;
+			padding: 14px;
+			text-align: center;
+			opacity:0.8;
+			font: 10px Courier New;
+			}
+		</style>
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+	</head>
+	<body>
+		<div id="chart"></div>	
+		
+		<script>
+			
+			var data = [
+			{
+			name: "India",
+			values: [
+			{Label: "Ant", Value: 120},
+			{Label: "Bat", Value: 112},
+			{Label: "Cat", Value: 77},
+			{Label: "Dog", Value: 94},
+			{Label: "Elephant", Value: 154},
+			{Label: "Fox", Value: 121},
+			{Label: "Goat", Value: 97},
+			{Label: "Hare", Value: 81},
+			{Label: "Impala", Value: 117}
+			]
+		},
+		{
+			name: "Russia",
+			values: [
+			{Label: "Ant", Value: 210},
+			{Label: "Bat", Value: 121},
+			{Label: "Cat", Value: 177},
+			{Label: "Dog", Value: 194},
+			{Label: "Elephant", Value: 145},
+			{Label: "Fox", Value: 82},
+			{Label: "Goat", Value: 79},
+			{Label: "Hare", Value: 118},
+			{Label: "Impala", Value: 171}
+			]
+		},
+		{
+			name: "USA",
+			values: [
+			{Label: "Ant", Value: 51},
+			{Label: "Bat", Value: 211},
+			{Label: "Cat", Value: 55},
+			{Label: "Dog", Value: 49},
+			{Label: "Elephant", Value: 54},
+			{Label: "Fox", Value: 42},
+			{Label: "Goat", Value: 47},
+			{Label: "Hare", Value: 51},
+			{Label: "Impala", Value: 150}
+			]
+		}
+		];
+		
+		var duration = 250;
+		
+		var lineOpacity = "0.50";
+		var lineOpacityHover = "0.85";
+		var otherLinesOpacityHover = "0.1";
+		var lineStroke = "2";
+		var lineStrokeHover = "4";
+		
+		var circleOpacity = '0.85';
+		var circleOpacityOnLineHover = "0.25"
+		var circleRadius = 3;
+		var circleRadiusHover = 6;
+		
+		var margin = {top: 20, right: 120, bottom: 70, left: 40},
+		width = 600 - margin.left - margin.right,
+		height = 300 - margin.top - margin.bottom;
+		max = 0
+		x_components = []
+		data.forEach(function(d) { 
+			d.values.forEach(function(d) {
+				d.Label = d.Label;
+				d.Value = +d.Value;
+				x_components.push(d.Label)
+			});
+			current_max = d3.max(d.values, d => d.Value)
+			if(max < current_max)
+			max = current_max
+		});
+		
+		xAxesName = x_components.reduce((acc, d) => acc.includes(d) ? acc : acc.concat(d), [])
+		
+		var x = d3.scaleBand()
+		.range([0, width])
+		.padding(0.1);
+		
+		var y = d3.scaleLinear()
+		.range([height, 0]);
+		
+		var color = d3.scaleOrdinal(d3.schemeCategory10);
+		
+		/* Add SVG */
+		var svg = d3.select("#chart").append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+		.append("g")
+		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+		var tooltip = d3.select("#chart")
+		.append("div")
+		.attr("class", "toolTip");
+		
+		x.domain(xAxesName);
+		y.domain([0, d3.max(data[0].values, d => d.Value) + 20 ]);
+		y.domain([0, max + 20 ]);
+		var xAxis = d3.axisBottom(x)
+		
+		var yAxis = d3.axisLeft(y)
+		.tickSize(-width, 0, 0); 
+		
+		// add axis
+		svg.append("g")
+		.attr("class", "x axis")
+		.attr("transform", "translate(0," + height + ")")
+		.call(xAxis)
+		.selectAll("text")
+		.style("text-anchor", "end")
+		.attr("dx", "-.8em")
+		.attr("dy", "-.55em")
+		.attr("transform", "rotate(-90)" );
+		
+		svg.append("g")
+		.attr("class", "y axis")
+		.call(yAxis)
+		.select(".domain").remove();
+		
+		svg.selectAll("line").attr("stroke", "lightgrey");
+		
+		/* Add line into SVG */
+		var line = d3.line()
+		.x(d => x(d.Label) + x.bandwidth()/2)
+		.y(d => y(d.Value))
+		.curve(d3.curveMonotoneX);
+		
+		let lines = svg.append('g')
+		.attr('class', 'lines');
+		
+		lines.selectAll('.line-group')
+		.data(data).enter()
+		.append('g')
+		.attr('class', 'line-group')  
+		.on("mouseover", function(d, i) {
+			svg.append("text")
+			.attr("class", "title-text")
+			.style("fill", color(i))        
+			.text(d.name)
+			.attr("text-anchor", "middle")
+			.attr("x", width/2)
+			.attr("y", 5);
+		})
+		.on("mouseout", function(d) {
+			svg.select(".title-text").remove();
+		})
+		.append('path')
+		.attr('class', 'line')  
+		.attr('d', d => line(d.values))
+		.style('stroke', (d, i) => color(i))
+		.style('stroke-width', lineStroke)
+		.style('opacity', lineOpacity)
+		.on("mouseover", function(d) {
+			d3.selectAll('.line')
+			.style('opacity', otherLinesOpacityHover);
+			d3.selectAll('.circle')
+			.style('opacity', circleOpacityOnLineHover);
+			d3.select(this)
+			.style('opacity', lineOpacityHover)
+			.style("stroke-width", lineStrokeHover)
+			.style("cursor", "pointer");
+		})
+		.on("mouseout", function(d) {
+			d3.selectAll(".line")
+			.style('opacity', lineOpacity);
+			d3.selectAll('.circle')
+			.style('opacity', circleOpacity);
+			d3.select(this)
+			.style("stroke-width", lineStroke)
+			.style("cursor", "none");
+		});
+		
+		
+		/* Add circles in the line */
+		lines.selectAll("circle-group")
+		.data(data).enter()
+		.append("g")
+		.style("fill", (d, i) => color(i))
+		.selectAll("circle")
+		
+		.data(d => d.values).enter()
+		.append("g")
+		.attr("class", "circle") 
+		.append("circle")
+		.attr("cx", d => x(d.Label)+ x.bandwidth()/2)
+		.attr("cy", d => y(d.Value))
+		.attr("r", circleRadius)
+		.style('opacity', circleOpacity)
+		.on("mousemove", function(d){
+			tooltip
+			.style("left", d3.event.pageX - 50 + "px")
+			.style("top", d3.event.pageY - 50 + "px")
+			.style("display", "inline-block")
+			.html((d.Label)+ " : " + (d.Value));
+		})
+		.on("mouseout", function(d){ tooltip.style("display", "none");});
+		
+		var legend = svg.append('g')
+        .attr('class', 'legend');
+		
+		legend.selectAll('rect')
+        .data(data)
+        .enter()
+		.append('rect')
+        .attr('x', width + 20)
+        .attr('y', function(d, i){ return (i *  20) + 10;})
+        .attr('width', 10)
+        .attr('height', 10)
+        .style('fill', (d, i) => color(i));
+		
+		legend.selectAll('text')
+		.data(data)
+        .enter()
+		.append('text')
+        .attr('x', width + 40)
+        .attr('y', function(d, i){ return (i * 20) + 18;})
+        .text(function(d){ return d.name; });
+		
+		
+		
+	</script>
+</body>
+</html>

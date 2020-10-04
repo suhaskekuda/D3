@@ -4,6 +4,10 @@
 		<meta charset="utf-8">
 		<title>Line Chart</title>
 		<style type="text/css">
+		    text {
+			font: 10px Courier New;
+			}
+			
 			.line {
 			fill: none;
 			stroke: #069;
@@ -76,21 +80,25 @@
 			] 
 			
 			 
+			// set the dimensions
 			var margin = {top: 20, right: 20, bottom: 70, left: 40},
 			width = 600 - margin.left - margin.right,
 			height = 300 - margin.top - margin.bottom;
 			
+			// set the ranges
 			var x = d3.scaleBand()
 			.range([0, width])
 			.padding(0.1);
 			
+			
 			var y = d3.scaleLinear()
 			.range([height, 0]);
 			
+			// define the axis
 			var xAxis = d3.axisBottom(x)
 			
 			var yAxis = d3.axisLeft(y)
-			.tickSize(-width, 0, 0); 
+			.tickSize(-width, 0, 0);
 			
 			var line = d3.line()
 			.x(function(d, i) { return x(d.Label) + x.bandwidth()/2; })
@@ -130,13 +138,15 @@
 			.attr("class", "y axis")
 			.call(yAxis)
 			.select(".domain").remove();
+			
+			svg.selectAll("line").attr("stroke", "lightgrey");
 			 
 			svg.append("path")
 			.datum(data)  
 			.attr("class", "line") 
 			.attr("d", line);
 			
-			svg.selectAll("line").attr("stroke", "lightgrey");
+			
 			  
 			svg.selectAll(".dot")
 			.data(data)
