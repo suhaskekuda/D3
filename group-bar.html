@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Group Bar chart</title>
+		<style>
+			
+			.axis {
+			font: 10px Courier New;
+			}
+			
+			.axis path{
+			fill: none;
+			stroke: #000;
+			shape-rendering: crispEdges;
+			}
+			
+			.toolTip {
+			position: absolute;
+			display: none;
+			min-width: 80px;
+			height: auto;
+			background: none repeat scroll 0 0 #ffffff;
+			border: 1px solid #6F257F;
+			padding: 14px;
+			text-align: center;
+			opacity:0.8;
+			font: 10px Courier New;
+			}
+			
+		</style>
+		<script src="https://d3js.org/d3.v5.min.js"></script>
+	</head>
+	<body>
+		<div id="chart"></div>		
+		<script>
+			//data
+			var data = [
+			{Label: "Ant", India: 120, Russia: 210, USA: 51},
+			{Label: "Bat", India: 112, Russia: 121, USA: 211},
+			{Label: "Cat", India:  77, Russia:  177, USA: 55},
+			{Label: "Dog", India:  94, Russia:  194, USA: 49},
+			{Label: "Elephant", India: 154, Russia: 145, USA: 54},
+			{Label: "Fox", India: 121, Russia: 82, USA: 42},
+			{Label: "Goat", India:  97, Russia:  79, USA: 47},
+			{Label: "Hare", India:  81, Russia:  118, USA: 51},
+			{Label: "Impala", India: 117, Russia: 171, USA: 150}
+			];
+			
+			var margin = {top: 20, right: 120, bottom: 70, left: 40},
+			width = 600 - margin.left - margin.right,
+			height = 300 - margin.top - margin.bottom;
+			
+			var svg = d3.select("#chart").append("svg")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+			.append("g")
+			.attr("transform","translate(" + margin.left + "," + margin.top + ")")
+			
+			var tooltip = d3.select("#chart")
+			.append("div")
+			.attr("class", "toolTip");
+			
+			
+			// The scale spacing the groups:
+			var x0 = d3.scaleBand()
+			.rangeRound([0, width])
+			.paddingInner(0.1);
+			
+			// The scale for spacing each group's bar:
+			var x1 = d3.scaleBand()
+			.padding(0.05);
+			
+			var y = d3.scaleLinear()
+			.rangeRound([height, 0]);
+			
+			var z = d3.scaleOrdinal(d3.schemeCategory10);
+			
+			var keys = ["India","Russia","USA"];
+			
+			x0.domain(data.map(function(d) { return d.Label; }));
+			x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+			y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice();
+			
+			// define the axis
+			var xAxis = d3.axisBottom(x0)
+			
+			var yAxis = d3.axisLeft(y)
+			.tickSize(-width, 0, 0);
+			
+			svg.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0," + y(0) + ")")
+			.call(xAxis)
+			.selectAll("text")
+			.style("text-anchor", "end")
+			.attr("dx", "-.8em")
+			.attr("dy", "-.55em")
+			.attr("transform", "rotate(-90)" );
+			
+			svg.append("g")
+			.attr("class", "y axis")
+			.call(yAxis)
+			.select(".domain").remove();
+			
+			svg.selectAll("line").attr("stroke", "lightgrey");
+			
+			svg.append("g")
+			.selectAll("g")
+			.data(data)
+			.enter().append("g")
+			.attr("class","bar")
+			.attr("transform", function(d) { return "translate(" + x0(d.Label) + ",0)"; })
+			.selectAll("rect")
+			.data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+			.enter().append("rect")
+			.attr("x", function(d) { return x1(d.key); })
+			.attr("y", function(d) { return y(d.value); })
+			.attr("width", x1.bandwidth())
+			.attr("height", function(d) { return height - y(d.value); })
+			.attr("fill", function(d) { return z(d.key); })
+			.on("mousemove", function(d){
+				tooltip
+				.style("left", d3.event.pageX - 50 + "px")
+				.style("top", d3.event.pageY - 70 + "px")
+				.style("display", "inline-block")
+				.html((d.key) + " : " + (d.value));
+			})
+			.on("mouseout", function(d){ tooltip.style("display", "none");});
+			
+						
+		    var legend = svg.append('g')
+			.attr('class', 'legend')
+			.attr("transform", 
+			"translate(0," + margin.top + ")");
+			
+			legend.selectAll('rect')
+			.data(keys.slice().reverse())
+			.enter()
+			.append('rect')
+			.attr('x', width + 20)
+			.attr('y', function(d, i){ return (i *  20) + 10;})
+			.attr('width', 10)
+			.attr('height', 10)
+			.style('fill', z)
+			
+			legend.selectAll('text')
+			.data(keys.slice().reverse())
+			.enter()
+			.append('text')
+			.attr('x', width + 40)
+			.attr('y', function(d, i){ return (i * 20) + 18;})
+			.text(function(d){ return d; });	
+			
+		</script>
+		
+	</body>
+</html>					
