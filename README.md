@@ -18,3 +18,9 @@ Area Chart\
 
 Multi line Chart\
 ![Multi line Chart](https://github.com/suhaskekuda/D3/blob/master/images/muilti_lineChart.PNG)
+
+Stack Bar Chart\
+![Stack Bar Chart](https://github.com/suhaskekuda/D3/blob/master/images/stackbarChart.PNG)
+
+Group Bar Chart\
+![Group Bar Chart](https://github.com/suhaskekuda/D3/blob/master/images/groupbarChart.PNG)
