@@ -22,5 +22,8 @@ Multi line Chart\
 Stack Bar Chart\
 ![Stack Bar Chart](https://github.com/suhaskekuda/D3/blob/master/images/stackbarChart.PNG)
 
+Fancy Stack Bar Chart\
+![Stack Bar Chart](https://github.com/suhaskekuda/D3/blob/master/images/fancy_stackbar.PNG)
+
 Group Bar Chart\
 ![Group Bar Chart](https://github.com/suhaskekuda/D3/blob/master/images/groupbarChart.PNG)
