@@ -10,6 +10,9 @@ Pie Chart\
 Donut Chart\
 ![Donut Chart](https://github.com/suhaskekuda/D3/blob/master/images/donutChart.PNG)
 
+Fancy Donut Chart\
+![Fancy Donut Chart](https://github.com/suhaskekuda/D3/blob/master/images/fancy_donut.PNG)
+
 Line Chart\
 ![Line Chart](https://github.com/suhaskekuda/D3/blob/master/images/lineChart.PNG)
 
